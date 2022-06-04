@@ -1,7 +1,7 @@
 use std::fmt;
 
 use crate::errors::Result;
-use crate::indicators::{ExponentialMovingAverage, TrueRange};
+use crate::indicators::{RelativeMovingAverage, TrueRange};
 use crate::{Close, High, Low, Next, Period, Reset};
 
 #[cfg(feature = "serde")]
@@ -61,21 +61,21 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone)]
 pub struct AverageTrueRange {
     true_range: TrueRange,
-    ema: ExponentialMovingAverage,
+    ma: RelativeMovingAverage,
 }
 
 impl AverageTrueRange {
     pub fn new(period: usize) -> Result<Self> {
         Ok(Self {
             true_range: TrueRange::new(),
-            ema: ExponentialMovingAverage::new(period)?,
+            ma: RelativeMovingAverage::new(period)?,
         })
     }
 }
 
 impl Period for AverageTrueRange {
     fn period(&self) -> usize {
-        self.ema.period()
+        self.ma.period()
     }
 }
 
@@ -83,7 +83,7 @@ impl Next<f64> for AverageTrueRange {
     type Output = f64;
 
     fn next(&mut self, input: f64) -> Self::Output {
-        self.ema.next(self.true_range.next(input))
+        self.ma.next(self.true_range.next(input))
     }
 }
 
@@ -91,14 +91,14 @@ impl<T: High + Low + Close> Next<&T> for AverageTrueRange {
     type Output = f64;
 
     fn next(&mut self, input: &T) -> Self::Output {
-        self.ema.next(self.true_range.next(input))
+        self.ma.next(self.true_range.next(input))
     }
 }
 
 impl Reset for AverageTrueRange {
     fn reset(&mut self) {
         self.true_range.reset();
-        self.ema.reset();
+        self.ma.reset();
     }
 }
 
@@ -110,7 +110,7 @@ impl Default for AverageTrueRange {
 
 impl fmt::Display for AverageTrueRange {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "ATR({})", self.ema.period())
+        write!(f, "ATR({})", self.ma.period())
     }
 }
 
@@ -135,8 +135,8 @@ mod tests {
         let bar3 = Bar::new().high(9).low(5).close(8);
 
         assert_eq!(atr.next(&bar1), 2.5);
-        assert_eq!(atr.next(&bar2), 2.25);
-        assert_eq!(atr.next(&bar3), 3.375);
+        assert_approx_eq::assert_approx_eq!(atr.next(&bar2), 7.0 / 3.0);
+        assert_approx_eq::assert_approx_eq!(atr.next(&bar3), 55.0 / 18.0);
     }
 
     #[test]

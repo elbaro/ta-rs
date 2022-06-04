@@ -64,11 +64,15 @@ pub struct ExponentialMovingAverage {
 
 impl ExponentialMovingAverage {
     pub fn new(period: usize) -> Result<Self> {
+        Self::with_k(period, 2.0 / (period + 1) as f64)
+    }
+
+    pub fn with_k(period: usize, k: f64) -> Result<Self> {
         match period {
             0 => Err(TaError::InvalidParameter),
             _ => Ok(Self {
                 period,
-                k: 2.0 / (period + 1) as f64,
+                k,
                 current: 0.0,
                 is_new: true,
             }),
