@@ -170,20 +170,20 @@ mod tests {
     fn test_next() {
         let mut rsi = RelativeStrengthIndex::new(3).unwrap();
         assert_eq!(rsi.next(10.0), 50.0);
-        assert_eq!(rsi.next(10.5).round(), 86.0);
-        assert_eq!(rsi.next(10.0).round(), 35.0);
-        assert_eq!(rsi.next(9.5).round(), 16.0);
+        assert_eq!(rsi.next(10.5).round(), 78.0);
+        assert_eq!(rsi.next(10.0).round(), 42.0);
+        assert_eq!(rsi.next(9.5).round(), 25.0);
     }
 
     #[test]
     fn test_reset() {
         let mut rsi = RelativeStrengthIndex::new(3).unwrap();
         assert_eq!(rsi.next(10.0), 50.0);
-        assert_eq!(rsi.next(10.5).round(), 86.0);
+        assert_eq!(rsi.next(10.5).round(), 78.0);
 
         rsi.reset();
         assert_eq!(rsi.next(10.0).round(), 50.0);
-        assert_eq!(rsi.next(10.5).round(), 86.0);
+        assert_eq!(rsi.next(10.5).round(), 78.0);
     }
 
     #[test]
