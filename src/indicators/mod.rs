@@ -2,6 +2,9 @@ mod moving_average;
 pub use self::moving_average::MovingAverage;
 pub use self::moving_average::MovingAverageType;
 
+mod linearly_weighted_moving_average;
+pub use self::linearly_weighted_moving_average::LinearlyWeightedMovingAverage;
+
 mod exponential_moving_average;
 pub use self::exponential_moving_average::ExponentialMovingAverage;
 

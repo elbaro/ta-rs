@@ -6,7 +6,7 @@ use crate::{Close, Next, Period, Reset};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-use super::{RelativeMovingAverage, SimpleMovingAverage};
+use super::{LinearlyWeightedMovingAverage, RelativeMovingAverage, SimpleMovingAverage};
 
 /// A moving average (MA).
 ///
@@ -23,12 +23,15 @@ pub enum MovingAverage {
     Simple(SimpleMovingAverage),
     Exponential(ExponentialMovingAverage),
     Relative(RelativeMovingAverage),
+    Linear(LinearlyWeightedMovingAverage),
 }
 
+#[derive(Copy, Clone, Debug)]
 pub enum MovingAverageType {
     Simple,
     Exponential,
     Relative,
+    Linear,
 }
 
 impl MovingAverage {
@@ -39,6 +42,7 @@ impl MovingAverage {
                 Self::Exponential(ExponentialMovingAverage::new(period)?)
             }
             MovingAverageType::Relative => Self::Relative(RelativeMovingAverage::new(period)?),
+            MovingAverageType::Linear => Self::Linear(LinearlyWeightedMovingAverage::new(period)?),
         };
         Ok(ma)
     }
@@ -50,6 +54,7 @@ impl Period for MovingAverage {
             MovingAverage::Simple(x) => x.period(),
             MovingAverage::Exponential(x) => x.period(),
             MovingAverage::Relative(x) => x.period(),
+            MovingAverage::Linear(x) => x.period(),
         }
     }
 }
@@ -62,6 +67,7 @@ impl Next<f64> for MovingAverage {
             MovingAverage::Simple(x) => x.next(input),
             MovingAverage::Exponential(x) => x.next(input),
             MovingAverage::Relative(x) => x.next(input),
+            MovingAverage::Linear(x) => x.next(input),
         }
     }
 }
@@ -74,6 +80,7 @@ impl<T: Close> Next<&T> for MovingAverage {
             MovingAverage::Simple(x) => x.next(input),
             MovingAverage::Exponential(x) => x.next(input),
             MovingAverage::Relative(x) => x.next(input),
+            MovingAverage::Linear(x) => x.next(input),
         }
     }
 }
@@ -84,6 +91,7 @@ impl Reset for MovingAverage {
             MovingAverage::Simple(x) => x.reset(),
             MovingAverage::Exponential(x) => x.reset(),
             MovingAverage::Relative(x) => x.reset(),
+            MovingAverage::Linear(x) => x.reset(),
         }
     }
 }
