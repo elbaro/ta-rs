@@ -1,3 +1,6 @@
+mod moving_average;
+pub use self::moving_average::MovingAverage;
+
 mod exponential_moving_average;
 pub use self::exponential_moving_average::ExponentialMovingAverage;
 
